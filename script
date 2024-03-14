@@ -1,0 +1,109 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out code from repository...'
+                git branch: 'main', url: 'https://github.com/gurwinderdhaliwal4785/task2.1'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Installing dependencies...'
+                echo 'Building application...'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+
+                script {
+                    def emailSubject = "Test success"
+                    def emailBody = "Tests passed successfully."
+                    sendEmailNotification(emailSubject, emailBody)
+                }
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                echo 'Performing code analysis...'
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                echo 'Performing security scans...'
+
+                script {
+                    def emailSubject = "Security checks passed"
+                    def emailBody = "Pipeline cleared security checks."
+                    sendEmailNotification(emailSubject, emailBody)
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying to staging environment...'
+            }
+        }
+
+        stage('Integration Tests') {
+            steps {
+                echo 'Running integration tests...'
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying the enviornment.....'
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                def emailSubject = "Pipeline execution successful"
+                def emailBody = "The pipeline executed successfully."
+                sendEmailNotification(emailSubject, emailBody)
+            }
+            echo 'Pipeline execution successful!'
+        }
+        failure {
+            script {
+                def emailSubject = "Pipeline execution failed"
+                def emailBody = "The pipeline failed to execute. Please check the logs for more details."
+                sendEmailNotification(emailSubject, emailBody)
+            }
+            echo 'Pipeline execution failed! Check the logs for more details.'
+        }
+    }
+}
+
+def sendEmailNotification(subject, body) {
+    def smtpServer = "smtp.gmail.com"
+    def smtpFrom = "dhaliwalpvt@gmail.com"
+    def smtpTo = "dhaliwalpvt@gmail.com"
+    def smtpUsername = "dhaliwalpvt@gmail.com"
+    def smtpPassword = "rwky xqqo whmd rxab"
+
+    emailext(
+        subject: subject,
+        body: body,
+        to: smtpTo,
+        from: smtpFrom,
+        attachLog: true,
+        mimeType: 'text/html',
+        smtpServer: smtpServer,
+        smtpPort: 587,
+        useSsl: true,
+        auth: true,
+        username: smtpUsername,
+        password: smtpPassword
+    )
+}
